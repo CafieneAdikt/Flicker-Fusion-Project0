@@ -4,8 +4,10 @@
 
  byte ADpin = 14;   // pin assigned to variable
  int AD0 = 0;       // raw A/D converter value
- int mapDelay = 0;  // mapped analog input
+ long interval = 0;  // mapped analog input
  int LED = 6;       // assign pin 6 to led
+ unsigned long previousmillis = 0; // will store last time led was updated
+
 
 void setup() {
 
@@ -16,20 +18,22 @@ void setup() {
 }
 
 void loop() {
+    // variable that stores current time
+    unsigned long currentmillis = millis();
 
     AD0 = analogRead(ADpin);    // read input from potentiometer
 
-    mapDelay = map(AD0, 0, 1023, 50, 1); // map 10bit number to a interval to cause flicker fusion
+    interval = map(AD0, 0, 1023, 50, 1); // map 10bit number to a interval to cause flicker fusion
 
- // Same time on/off for 50% dutycycle
-    digitalWrite(LED,HIGH);
-    delay(mapDelay);
+    if(currentmillis - previousmillis >= interval){
+        //save last time it blinks
+        previousmillis = currentmillis;
 
-    digitalWrite(LED,LOW);
-    delay(mapDelay);
+        // change the state of the led to opposite of previous state 
+    digitalWrite(LED, !digitalRead(LED));
+    }
 
-// serial interface
-   Serial.println(mapDelay);
-
+   // serial interface
+   Serial.println(interval);
 
 }
