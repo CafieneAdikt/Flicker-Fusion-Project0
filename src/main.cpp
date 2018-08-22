@@ -4,7 +4,8 @@
 
  byte ADpin = 14;   // pin assigned to variable
  int AD0 = 0;       // raw A/D converter value
- long interval = 0;  // mapped analog input
+ unsigned long interval = 0;  // mapped analog input
+ long intervalInseconds = 0; 
  int LED = 6;       // assign pin 6 to led
  const int INTBUTTON = 16; // interupt button
  bool Buttonpressed = false; // flag for button
@@ -12,6 +13,13 @@
  unsigned long previousdebounce = 0;
  unsigned long previousmillis = 0; // will store last time led was updated
  long frequency = 0; // frequency of the led
+
+  void Buttonpressed_ISR(){
+      // send flag high
+      Buttonpressed = true;
+  
+}
+ 
 
 
 void setup() {
@@ -40,7 +48,9 @@ void loop() {
     digitalWrite(LED, !digitalRead(LED));
     }
 
-    frequency = 1/(2*interval);
+    intervalInseconds = interval/1000;
+
+    frequency = 1/(2*intervalInseconds);
 
     if(Buttonpressed && ((currentmillis-previousdebounce) >= DEBOUNCE_TIME_MS)){
         previousdebounce = currentmillis; // set new debounce time
@@ -51,8 +61,3 @@ void loop() {
 
 }
 
-  void Buttonpressed_ISR(){
-      // send flag high
-      Buttonpressed = true;
-  
-}
